@@ -2,6 +2,7 @@ from app import db
 from app.models.car import CarState, Cars
 from datetime import datetime
 from app.models.rental import Rental
+from app.utils.validators import Validators
 
 class RentalController:
     @staticmethod
@@ -63,7 +64,38 @@ class RentalController:
     def get_rentals(filter_by=None):
         # Optionally filter rentals by provided criteria
         if filter_by:
-            rentals = db.session.query(Rental).filter_by(**filter_by).all()
+            query = db.session.query(Rental)
+            
+            filter_args = {}
+            time_filters = {}
+
+            for key, value in filter_by.items():
+                if key in ["rented_before", "rented_after", "returned_before", "returned_after"]:
+                    try:
+                        if Validators.is_valid_iso_date(value):
+                            time_filters[key] = datetime.fromisoformat(value)
+                    except ValueError:
+                        return {"message": f"Invalid datetime format for {key}. Use ISO 8601 format."}, True
+                else:
+                    filter_args[key] = value  # for exact match filters
+
+            query = Rental.query
+
+            # Apply exact match filters if needed
+            if filter_args:
+                query = query.filter_by(**filter_args)
+
+            # Apply time-based filters cleanly
+            if "rented_before" in time_filters:
+                query = query.filter(Rental.rented_at < time_filters["rented_before"])
+            if "rented_after" in time_filters:
+                query = query.filter(Rental.rented_at > time_filters["rented_after"])
+            if "returned_before" in time_filters:
+                query = query.filter(Rental.returned_at.isnot(None), Rental.returned_at < time_filters["returned_before"])
+            if "returned_after" in time_filters:
+                query = query.filter(Rental.returned_at.isnot(None), Rental.returned_at > time_filters["returned_after"])
+
+            rentals = query.all()
         else:
             rentals = db.session.query(Rental).all()
         

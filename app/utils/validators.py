@@ -19,3 +19,10 @@ class Validators:
     def is_valid_year(year: str) -> bool:
         year_regex = re.compile(r"^\d{4}$")
         return bool(year_regex.match(year))
+    
+    @staticmethod
+    def is_valid_iso_date(date_str: str) -> bool:
+        iso_date_regex = re.compile(
+            r"^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?)?$"
+        )
+        return bool(iso_date_regex.match(date_str))
