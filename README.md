@@ -71,6 +71,7 @@ This project is a Flask-based backend API for a car rental service. It supports 
 
 - `POST /auth/register` — Register a new user or merchant
 - `POST /auth/login` — Login with Basic Auth
+- `PUT /auth/update` - Update user email, password and phone number
 
 ### Car
 
