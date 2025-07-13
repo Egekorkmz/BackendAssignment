@@ -32,5 +32,23 @@ def login():
     else :
         return jsonify({"message": "Invalid credentials"}), 400
 
+@bp.route('/update', methods=['PUT'])
+def update_user():
+    response, is_verified = verify_basic_auth()
+    if not is_verified:
+        return response, 401 # Unauthorized
+    
+    user = response  # The user object is returned from verify_basic_auth
+    
+    data = request.get_json() or {}
+
+    if not data.get('username'):
+        return jsonify({"message": "Username is required"}), 400
+
+    response, error = UserController().update_user(user.id, data)
+    if error:
+        return jsonify(response), 400
+
+    return jsonify(response), 200
 #@bp.route('/test', methods=['GET'])
 #def test():
