@@ -4,6 +4,10 @@
 
 This project is a Flask-based backend API for a car rental service. It supports user registration, authentication, car management, and rental operations. The backend uses PostgreSQL for data storage and SQLAlchemy for ORM.
 
+## Postman Link
+
+https://www.postman.com/payload-cosmonaut-33336076/workspace/personal-workspace/collection/32683991-70bbc1c5-bd37-4450-962f-7bf23b8fa0ee?action=share&creator=32683991
+
 ## Features
 
 - User registration and authentication (Basic Auth)
