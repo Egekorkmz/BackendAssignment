@@ -27,7 +27,8 @@ def register():
 
 @bp.route('/login', methods=['POST'])
 def login():
-    if verify_basic_auth():
+    response, is_verified = verify_basic_auth()
+    if is_verified:
         return jsonify({"message": "Login successful"}), 200
     else :
         return jsonify({"message": "Invalid credentials"}), 400
