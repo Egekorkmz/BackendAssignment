@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask import request
 from app.controllers.car_controller import CarController
+from app.models.car import CarState
 from app.utils.auth import verify_basic_auth
 
 bp = Blueprint('car', __name__, url_prefix='/car')

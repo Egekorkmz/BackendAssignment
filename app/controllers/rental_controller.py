@@ -7,6 +7,11 @@ from app.utils.validators import Validators
 class RentalController:
     @staticmethod
     def rent_car(car_id, user_id):
+        rented_car = db.session.query(Rental).filter_by(user_id=user_id, returned_at=None).first()
+        if rented_car:
+            # User already has this car rented and not returned yet
+            return {"message": "You have already rented car and it is not returned yet."}, True
+
         # Find the car by ID and ensure it is available
         car = db.session.query(Cars).filter_by(id=car_id, state=CarState.AVAILABLE).first()
         

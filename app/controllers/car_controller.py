@@ -6,7 +6,7 @@ from app.models.car import CarState
 class CarController:
     # Get all cars for a specific merchant by merchant_id
     def get_cars_by_merchantID(self, merchant_id):
-        cars = db.session.query(Cars).filter_by(merchant_id=merchant_id).all()
+        cars = db.session.query(Cars).filter_by(merchant_id=merchant_id).filter(Cars.state != CarState.DELETED).all()
         
         if not cars:
             return {"message": "No cars found for this merchant"}, True
@@ -30,9 +30,9 @@ class CarController:
     # Get all cars, optionally filtered by provided criteria
     def get_cars(self, filter_by=None):
         if filter_by:
-            cars = db.session.query(Cars).filter_by(**filter_by).all()
+            cars = db.session.query(Cars).filter_by(**filter_by).filter(Cars.state != CarState.DELETED).all()
         else:
-            cars = db.session.query(Cars).all()
+            cars = db.session.query(Cars).filter(Cars.state != CarState.DELETED).all()
         
         if not cars:
             return {"message": "No cars found"}, True
@@ -68,12 +68,13 @@ class CarController:
         if missing_fields:
             return {"message": f"Missing fields: {', '.join(missing_fields)}"}, True
         
-        # Uncomment and implement validation if needed
-        #if not Validators.is_valid_year(data['year']):
-            return {"message": "Invalid year format"}, 400
-        
-        #if not Validators.is_valid_price(data['price_per_day']):
-            return {"message": "Invalid price format"}, 400
+        # Validate that year and price_per_day are numeric
+        if not str(data['year']).isdigit():
+            return {"message": "Invalid year format"}, True
+        try:
+            float(data['price_per_day'])
+        except (ValueError, TypeError):
+            return {"message": "Invalid price format"}, True
         
         car = Cars(
             merchant_id=data['merchant_id'],
@@ -87,7 +88,17 @@ class CarController:
         db.session.add(car)
         db.session.commit()
         
-        return {"message": "Car added successfully", "car": car.to_dict}, False
+        car_dict = {
+            "id": car.id,
+            "make": car.make,
+            "model": car.model,
+            "year": car.year,
+            "price_per_day": car.price_per_day,
+            "state": car.state.name,  # Convert enum to string
+            "merchant_id": car.merchant_id
+        }
+
+        return {"message": "Car added successfully", "car": car_dict}, False
     
     # Update an existing car's details
     def update_car(self, merchant_id, car_id, data):

@@ -32,19 +32,5 @@ def login():
     else :
         return jsonify({"message": "Invalid credentials"}), 400
 
-@bp.route('/test', methods=['GET'])
-def test():
-    data = request.authorization  # 🔹 Extract Basic Auth
-
-    if not data or not data.username or not data.password:
-        return jsonify({"message": "Missing Basic Auth headers"}), 400
-
-    user = Users.query.filter_by(username=data.username).first()
-    if user and check_password_hash(user.password_hash, data.password):
-        # Set session and return success
-        return jsonify({"message": "Login successful"}), 200
-    else:
-        return jsonify({"message": "Invalid credentials"}), 401
-
-
-
+#@bp.route('/test', methods=['GET'])
+#def test():

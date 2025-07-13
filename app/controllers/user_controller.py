@@ -55,7 +55,7 @@ class UserController:
         if not Validators.is_valid_email(data['email']):
             return {"message": "Invalid email format"}, True
         
-        if not Validators.is_valid_phone(data['phone_number']):
+        if not Validators.is_valid_phone(str(data['phone_number'])):
             return {"message": "Invalid phone number format"}, True
         
         if Users.query.filter_by(username=data['username']).first():
